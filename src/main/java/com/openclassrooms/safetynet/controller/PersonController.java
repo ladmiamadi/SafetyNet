@@ -1,6 +1,6 @@
 package com.openclassrooms.safetynet.controller;
 
-import com.openclassrooms.safetynet.exceptions.NotFoundPersonException;
+import com.openclassrooms.safetynet.exceptions.NotFoundException;
 import com.openclassrooms.safetynet.model.Person;
 import com.openclassrooms.safetynet.repository.PersonRepository;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class PersonController {
 
          if(person == null) {
              logger.error("La personne avec l'id: " + id + " est introuvable!");
-             throw new NotFoundPersonException("La personne avec l'id: " + id + " est introuvable!");
+             throw new NotFoundException("La personne avec l'id: " + id + " est introuvable!");
          }
 
         logger.info("Informations sur la personne avec l'id: "+ id);
@@ -64,7 +64,7 @@ public class PersonController {
 
         if(personToUpdate == null) {
             logger.error("La personne avec l'id: " + id + " est introuvable!");
-            throw new NotFoundPersonException("La personne avec l'id: " + id + " est introuvable!");
+            throw new NotFoundException("La personne avec l'id: " + id + " est introuvable!");
         }
         return personRepository.update(id, person);
     }
@@ -75,7 +75,7 @@ public class PersonController {
 
         if(person == null) {
             logger.error("La personne avec l'id: " + id + " est introuvable!");
-            throw new NotFoundPersonException("La personne avec l'id: " + id + " est introuvable!");
+            throw new NotFoundException("La personne avec l'id: " + id + " est introuvable!");
         }
 
         personRepository.delete(id);

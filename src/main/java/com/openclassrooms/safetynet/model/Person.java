@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class Person {
 
-    @JsonIgnore
+    //@JsonIgnore
     private int id;
 
     private String firstName;

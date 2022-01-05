@@ -46,7 +46,7 @@
 			<artifactId>jsoniter</artifactId>
 			<version>0.9.19</version>
 		</dependency>
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>

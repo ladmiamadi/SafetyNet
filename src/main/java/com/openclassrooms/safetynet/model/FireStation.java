@@ -1,13 +1,21 @@
 package com.openclassrooms.safetynet.model;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
-import org.springframework.stereotype.Component;
+
 
 import java.util.List;
 
 @Data
-@Component
 public class FireStation {
-    private int station;
-    private List<HouseAddress> addresses;
+
+    private int id;
+    private String station;
+    private List<String> addresses;
+
+    public FireStation(int id, String station, List<String> addresses) {
+        this.id = id;
+        this.station = station;
+        this.addresses = addresses;
+    }
 }
