@@ -1,9 +1,11 @@
 package com.openclassrooms.safetynet.model;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 @Data
+@JsonFilter("monFiltre")
 public class Person {
 
     //@JsonIgnore

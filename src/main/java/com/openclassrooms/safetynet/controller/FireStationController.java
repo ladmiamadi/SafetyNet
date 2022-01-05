@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -72,7 +73,7 @@ public class FireStationController {
     }
 
     @DeleteMapping("/firestation/{id}")
-    public void deletePerson (@PathVariable("station") int id) {
+    public void deletePerson (@PathVariable("id") int id) {
         FireStation fireStation = fireStationRepository.findById(id);
 
         if(fireStation == null) {
@@ -82,4 +83,6 @@ public class FireStationController {
 
         fireStationRepository.delete(id);
     }
+
+
 }
