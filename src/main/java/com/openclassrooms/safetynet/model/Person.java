@@ -5,10 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 @Data
-@JsonFilter("monFiltre")
 public class Person {
 
-    //@JsonIgnore
+    @JsonIgnore
     private int id;
 
     private String firstName;
@@ -18,7 +17,6 @@ public class Person {
     private String address;
     private String city;
     private String zip;
-    private MedicalRecords medicalRecords;
 
     public Person(int id, String firstName, String lastName, String phone, String email, String address, String city, String zip) {
         this.id = id;

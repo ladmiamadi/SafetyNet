@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class FireStation {
 
+    @JsonIgnore
     private int id;
     private String station;
     private List<String> addresses;

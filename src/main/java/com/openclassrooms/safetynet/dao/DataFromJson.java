@@ -1,18 +1,18 @@
 package com.openclassrooms.safetynet.dao;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;
 import com.openclassrooms.safetynet.model.FireStation;
+import com.openclassrooms.safetynet.model.MedicalRecords;
 import com.openclassrooms.safetynet.model.Person;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class DataFromJson {
@@ -25,6 +25,18 @@ public class DataFromJson {
         bytesFile = Files.readAllBytes(new File(fileUrl).toPath());
         jsonIterator = JsonIterator.parse(bytesFile);
         buffer = jsonIterator.readAny();
+    }
+
+    private List<String> getList (Any buffer) {
+
+        List<String> medicationsList = new ArrayList<>();
+        if(buffer.size()<0) {
+            return new ArrayList<>();
+        }
+
+        buffer.forEach(medication -> medicationsList.add(medication.toString()));
+
+        return medicationsList;
     }
 
     public List<Person> getPersons() {
@@ -50,11 +62,23 @@ public class DataFromJson {
                 fireStations.put(a.get("station").toString(), new ArrayList<>());
             }
         });
+
         for (Map.Entry mapentry : fireStations.entrySet()) {
             fireStationList.add(new FireStation(fireStationList.size(), (String) mapentry.getKey(), (List<String>) mapentry.getValue()));
         }
         return fireStationList;
-
     }
 
+    public List<MedicalRecords> getMedicalRecords () {
+
+        List<MedicalRecords> medicalRecordsList = new ArrayList<>();
+
+        Any readMedicalRecords = buffer.get("medicalrecords");
+        readMedicalRecords.forEach(a ->{
+           medicalRecordsList.add(new MedicalRecords(a.get("firstName").toString(), a.get("lastName").toString(),
+                   a.get("birthdate").toString(), getList(a.get("medications")), getList(a.get("allergies"))));
+            });
+
+        return medicalRecordsList;
+    }
 }

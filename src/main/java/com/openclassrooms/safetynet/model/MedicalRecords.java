@@ -6,11 +6,19 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Data
-@Component
 public class MedicalRecords {
     private String firstName;
     private String lastName;
     private String birthDate;
-    private List<String> allergies;
     private List<String> medications;
+    private List<String> allergies;
+
+
+    public MedicalRecords(String firstName, String lastName, String birthDate, List<String> medications, List<String> allergies) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.allergies = allergies;
+        this.medications = medications;
+    }
 }

@@ -1,18 +1,12 @@
 package com.openclassrooms.safetynet;
 
-import com.openclassrooms.safetynet.dao.DataFromJson;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.IOException;
+import org.springframework.boot.autoconfigure.SpringBootApplication;;
 
 @SpringBootApplication
 public class SafetynetApplication {
-	private static final Logger LOG = (Logger) LogManager.getLogger(SafetynetApplication.class);
-	public static void main(String[] args) throws IOException {
+
+	public static void main(String[] args) {
 		SpringApplication.run(SafetynetApplication.class, args);
 	}
 
