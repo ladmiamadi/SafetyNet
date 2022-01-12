@@ -1,17 +1,18 @@
 package com.openclassrooms.safetynet.dao;
 
 import com.openclassrooms.safetynet.model.FireStation;
-
-import java.util.List;
+import java.util.Map;
 
 public interface FireStationDAO {
-    List<FireStation> findAll ();
+    Map<Integer, FireStation> findAll ();
 
-    FireStation findById(int id);
+    FireStation findById(Integer id);
+
+    Integer findByAddress (String address);
 
     FireStation save(FireStation fireStation);
 
-    FireStation update(int id, FireStation fireStation);
+    FireStation update(Integer id, FireStation fireStation);
 
-    void delete(int id);
+    void delete(Integer id);
 }

@@ -8,15 +8,15 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class PersonRepository implements PersonDAO {
 
-     private DataFromJson dataFromJson = new DataFromJson();
-
      private static List<Person> personList = new ArrayList<>();
 
      public PersonRepository() throws IOException {
+          DataFromJson dataFromJson = new DataFromJson();
           personList = dataFromJson.getPersons();
      }
 
@@ -51,5 +51,41 @@ public class PersonRepository implements PersonDAO {
      @Override
      public void delete(int id) {
           personList.remove(id);
+     }
+
+     @Override
+     public List<String> findEmailsByCity(String city) {
+          List<String> emailsList = new ArrayList<>();
+          for(Person person: personList) {
+               if(Objects.equals(person.getCity(), city)) {
+                    emailsList.add(person.getEmail());
+               }
+          }
+          return emailsList;
+     }
+
+     @Override
+     public List<Person> findByAddress(String address) {
+
+          List<Person> persons = new ArrayList<>();
+          personList.forEach(person -> {
+
+               if(Objects.equals(person.getAddress(), address)) {
+                    persons.add(person);
+               }
+          });
+
+          return persons;
+     }
+
+     @Override
+     public List<Person> findByFirstNameAndLastName(String firstName, String lastName) {
+          List<Person> filteredList = new ArrayList();
+          for(Person person: personList) {
+               if(Objects.equals(person.getFirstName(), firstName) && Objects.equals(person.getLastName(), lastName)) {
+                    filteredList.add(person);
+               }
+          }
+          return filteredList;
      }
 }

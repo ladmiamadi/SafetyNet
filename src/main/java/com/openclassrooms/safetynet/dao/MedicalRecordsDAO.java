@@ -1,7 +1,6 @@
 package com.openclassrooms.safetynet.dao;
 
 import com.openclassrooms.safetynet.model.MedicalRecords;
-import com.openclassrooms.safetynet.model.Person;
 
 import java.util.List;
 

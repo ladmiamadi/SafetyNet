@@ -14,4 +14,10 @@ public interface PersonDAO{
     Person update(int id, Person person);
 
     void delete(int id);
+
+    List<String> findEmailsByCity (String city);
+
+    List<Person> findByAddress(String Address);
+
+    List<Person> findByFirstNameAndLastName(String firstName, String lastName);
 }

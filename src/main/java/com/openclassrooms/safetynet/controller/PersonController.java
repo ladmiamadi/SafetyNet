@@ -2,15 +2,17 @@ package com.openclassrooms.safetynet.controller;
 
 import com.openclassrooms.safetynet.exceptions.NotFoundException;
 import com.openclassrooms.safetynet.model.Person;
+import com.openclassrooms.safetynet.repository.HelperRepository;
 import com.openclassrooms.safetynet.repository.PersonRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.net.URI;
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -21,8 +23,9 @@ public class PersonController {
     private static Logger logger = LoggerFactory.getLogger(PersonController.class);
 
     @GetMapping("/person")
-    public Iterable<Person> personsList() {
-        return personRepository.findAll();
+    public MappingJacksonValue personsList() {
+        List personList = personRepository.findAll();
+        return HelperRepository.getFilter("personFilter", personList, "id", "");
     }
 
     @GetMapping("/person/{id}")
@@ -80,4 +83,5 @@ public class PersonController {
 
         personRepository.delete(id);
     }
+
 }

@@ -8,12 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.net.URI;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -24,7 +22,7 @@ public class FireStationController {
     private static Logger logger = LoggerFactory.getLogger(PersonController.class);
 
     @GetMapping("/firestation")
-    public List<FireStation> fireStationsList() {
+    public Map<Integer, FireStation> fireStationsList() {
         return fireStationRepository.findAll();
     }
 
