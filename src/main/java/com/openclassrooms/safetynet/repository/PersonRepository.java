@@ -26,9 +26,9 @@ public class PersonRepository implements PersonDAO {
      }
 
      @Override
-     public Person findById(int id) {
+     public Person findByFirstNameAndLastName(String firstName, String lastName) {
           for(Person person: personList) {
-               if(person.getId() == id) {
+               if(Objects.equals(person.getFirstName(), firstName) && Objects.equals(person.getLastName(), lastName)) {
                     return person;
                }
           }
@@ -42,15 +42,26 @@ public class PersonRepository implements PersonDAO {
           return person;
      }
 
-     @Override
-     public Person update(int id, Person person) {
-          personList.set(id, person);
-          return findById(id);
+     public int findIndexOfFirstNameAndLastName(String firstName, String lastName) {
+          int index = -1;
+
+          for (Person person: personList) {
+               if(Objects.equals(person.getLastName(), lastName) && Objects.equals(person.getFirstName(), firstName)) {
+                    index = personList.indexOf(person);
+               }
+          }
+          return index;
      }
 
      @Override
-     public void delete(int id) {
-          personList.remove(id);
+     public Person update(String firstName, String lastName, Person person) {
+          personList.set(findIndexOfFirstNameAndLastName(firstName, lastName), person);
+          return findByFirstNameAndLastName(firstName, lastName);
+     }
+
+     @Override
+     public void delete(String firstName, String lastName) {
+          personList.remove(findIndexOfFirstNameAndLastName(firstName, lastName));
      }
 
      @Override
@@ -78,14 +89,5 @@ public class PersonRepository implements PersonDAO {
           return persons;
      }
 
-     @Override
-     public List<Person> findByFirstNameAndLastName(String firstName, String lastName) {
-          List<Person> filteredList = new ArrayList();
-          for(Person person: personList) {
-               if(Objects.equals(person.getFirstName(), firstName) && Objects.equals(person.getLastName(), lastName)) {
-                    filteredList.add(person);
-               }
-          }
-          return filteredList;
-     }
+
 }

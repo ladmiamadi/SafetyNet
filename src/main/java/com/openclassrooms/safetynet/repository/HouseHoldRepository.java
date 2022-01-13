@@ -6,10 +6,7 @@ import com.openclassrooms.safetynet.model.Person;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Repository
 public class HouseHoldRepository implements HouseHoldDAO {
@@ -40,14 +37,37 @@ private static DataFromJson dataFromJson;
     }
 
     @Override
-    public List<Person> findChildrenByAddress(String address) {
-        List<Person> childrenList = new ArrayList<>();
+    public List<Map<String, String>> findChildrenByAddress(String address) {
+        List<Map<String, String>> childrenList = new ArrayList<>();
         for(Person person: findByAddress(address)) {
-            if(HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate()) <= 18) {
-                childrenList.add(person);
+            long age = HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate());
+
+
+            if(age <= 18) {
+                Map<String , String> children = new LinkedHashMap<>();
+                children.put("firstName", person.getFirstName());
+                children.put("lastName", person.getLastName());
+                children.put("age", age + " years");
+                childrenList.add(children);
             }
         }
-
         return childrenList;
+    }
+
+    @Override
+    public List<Map<String, String>> findAdultsByAddress(String address) {
+        List<Map<String, String>> adultList = new ArrayList<>();
+        for(Person person: findByAddress(address)) {
+            long age = HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate());
+
+            if(HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate()) > 18) {
+                Map<String, String> adult = new LinkedHashMap<>();
+                adult.put("firstName", person.getFirstName());
+                adult.put("lastName", person.getLastName());
+                adult.put("age", age + " years");
+                adultList.add(adult);
+            }
+        }
+        return adultList;
     }
 }

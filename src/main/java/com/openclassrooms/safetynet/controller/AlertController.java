@@ -11,9 +11,7 @@ import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 public class AlertController {
@@ -30,58 +28,35 @@ public class AlertController {
     //Récuperer la Liste des habitant couverts par une station
     @GetMapping("/firestations")
     public MappingJacksonValue getCoveredPersonsByFirestation (@RequestParam("stationNumber") Integer stationNumber) {
-        List<Object> personsList = new ArrayList<>();
-        AtomicInteger adultCount = new AtomicInteger();
-        AtomicInteger childCount = new AtomicInteger();
+        List personsList = new ArrayList<>();
 
         if(stationNumber != null) {
             FireStation fireStation = fireStationRepository.findById(stationNumber);
 
             List<String> addresses = new ArrayList<>(fireStation.getAddresses());
 
-            addresses.forEach(address -> personRepository.findByAddress(address).forEach(person -> {
-                personsList.add(person);
-
-                long age = HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate());
-                if(age <= 18 ) {
-                    childCount.getAndIncrement();
-                } else {
-                    adultCount.getAndIncrement();
-                }
-            }));
+            addresses.forEach(address -> personsList.addAll(personRepository.findByAddress(address)));
         }
 
-        personsList.add("Number of children: " + childCount);
-        personsList.add("Number of adults: " + adultCount);
+        personsList.add(HelperRepository.countChildrenAndAdults(personsList));
 
         return HelperRepository.getFilter("personFilter", personsList, "medicalRecords", "email", "city", "zip");
     }
 
-    //Récuperer la litse d'enfants habitants à une adresse
+    //Récuperer la liste d'enfants habitants à une adresse
     @GetMapping("/childAlert")
-    public List<Map> getChildrenByAddress(@RequestParam("address") String address) {
-        List<Person> members = houseHoldRepository.findByAddress(address);
-        List<Map> childrenList = new ArrayList<>();
-        Map adultList = new HashMap();
-        List adult = new ArrayList();
+    public Map<String, List<Map<String, String>>> getChildrenByAddress(@RequestParam("address") String address) {
+        Map<String, List<Map<String, String>>> personList = new LinkedHashMap<>();
 
-        for(Person member: members) {
-            Map child = new HashMap<>();
-            long age = HelperRepository.calculateAge(member.getMedicalRecords().getBirthDate());
-            if(age <= 18) {
-                child.put("firstName", member.getFirstName());
-                child.put("lastName", member.getLastName());
-                child.put("age", age + " years");
-                childrenList.add(child);
-            } else {
-                adult.add(member.getFirstName() + " "+ member.getLastName() + " "+ age + " years");
+        if(address != null) {
+            List<Map<String, String>> childrenList = houseHoldRepository.findChildrenByAddress(address);
+            if( !childrenList.isEmpty()) {
+                List<Map<String, String>> adultList = houseHoldRepository.findAdultsByAddress(address);
+                personList.put("List of children", childrenList);
+                personList.put("other members of the household", adultList);
             }
         }
-        adultList.put("Other members of houseHold", adult );
-
-        if(childrenList.isEmpty()) {return new ArrayList<>();}
-        childrenList.add(adultList);
-        return childrenList;
+        return personList;
     }
 
     //Récupérer les numéros de téléphone des personnes desservis par la caserne de pompiers
@@ -92,23 +67,37 @@ public class AlertController {
             FireStation fireStation = fireStationRepository.findById(firestation);
 
             List<String> addresses = new ArrayList<>(fireStation.getAddresses());
-            addresses.forEach(address -> personRepository.findByAddress(address).forEach(person ->
-                    phoneList.add(person.getPhone())));
+            addresses.forEach(address -> personRepository.findByAddress(address).forEach(person ->{
+                if(!phoneList.contains(person.getPhone())) {
+                    phoneList.add(person.getPhone());
+                }
+                    }));
         }
         return phoneList;
     }
 
     // Récupérer la liste des habitants et la caserne qui les desservit à partir d'une adresse donnée
     @GetMapping("/fire")
-    public MappingJacksonValue getPersonsAndFireStationByAddress (@RequestParam("address") String address) {
-        if(address != null) {
-            List personList = personRepository.findByAddress(address);
-            personList.add("couvert(s) par la caserne de pompiers: " + fireStationRepository.findByAddress(address));
+    public Map getPersonsAndFireStationByAddress (@RequestParam("address") String address) {
+        Map fireStationPersonsList = new LinkedHashMap<>();
+        List<Map> personsList = new ArrayList<>();
 
-            return HelperRepository.getFilter("personFilter", personList, "firstName", "email", "city", "zip");
+        if(address != null) {
+            for(Person person: personRepository.findByAddress(address)) {
+                Map member = new LinkedHashMap<>();
+                member.put("firstName", person.getFirstName());
+                member.put("lastName", person.getLastName());
+                member.put("age", HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate()) + " years");
+                member.put("medications", person.getMedicalRecords().getMedications());
+                member.put("allergies", person.getMedicalRecords().getAllergies());
+
+                personsList.add(member);
+            }
+            fireStationPersonsList.put("persons", personsList);
+            fireStationPersonsList.put("covered By station ", fireStationRepository.findByAddress(address));
         }
 
-        return null;
+        return fireStationPersonsList;
     }
 
     //Récuperer les habitants d'une addresse desservie par une station de pompiers
@@ -116,8 +105,7 @@ public class AlertController {
     public Map<String, List> getHouseHoldForFloodALert (@RequestParam("stations") List<String> stations) {
         List<String> addresses = new ArrayList<>();
         Map<String, List> houseHold = new HashMap<>();
-        List<Map> persons = new ArrayList();
-
+        List<Map> persons = new ArrayList<>();
 
         if(!stations.isEmpty()) {
             for (String station : stations) {
@@ -127,7 +115,7 @@ public class AlertController {
 
         for(String address: addresses) {
             houseHoldRepository.findByAddress(address).forEach(inhabitant -> {
-                Map person = new LinkedHashMap();
+                Map person = new LinkedHashMap<>();
                 person.put("firstName", inhabitant.getFirstName());
                 person.put("lastName", inhabitant.getLastName());
                 person.put("phone", inhabitant.getPhone());
@@ -142,27 +130,24 @@ public class AlertController {
         return houseHold;
     }
 
-    //Récupérer les info sur une personne
+    //Récupérer les info d'une personne
     @GetMapping("/personInfo")
     public List<Map> getPersonInfo(@RequestParam("firstName") String firstName,
                                    @RequestParam("lastName") String lastName) {
 
         List<Map> personInfoList = new ArrayList<>();
-        List<Person> personList = personRepository.findByFirstNameAndLastName(firstName, lastName);
+        Person person = personRepository.findByFirstNameAndLastName(firstName, lastName);
 
-        for(Person person: personList) {
-            Map info = new LinkedHashMap();
-            long age = HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate());
+            Map info = new LinkedHashMap<>();
 
             info.put("firstName", person.getFirstName());
             info.put("lastName", person.getLastName());
             info.put("address", person.getAddress());
-            info.put("age", age + " years");
+            info.put("age", HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate() + " years"));
             info.put("medications", person.getMedicalRecords().getMedications());
             info.put("allergies", person.getMedicalRecords().getAllergies());
 
             personInfoList.add(info);
-        }
 
         return personInfoList;
     }
@@ -170,10 +155,14 @@ public class AlertController {
     //Récupérer les emails de tous habitants d'une ville'
     @GetMapping("/communityEmail")
     public List<String> emailsList(@RequestParam("city") String city) {
+        List<String> emailsList = new ArrayList<>();
         if(city != null) {
-            return personRepository.findEmailsByCity(city);
-        } else {
-            return null;
+            for(String email: personRepository.findEmailsByCity(city)) {
+                if(!emailsList.contains(email)) {
+                    emailsList.add(email);
+                }
+            }
         }
+        return emailsList;
     }
 }

@@ -20,26 +20,26 @@ public class PersonController {
     @Autowired
     PersonRepository personRepository;
 
-    private static Logger logger = LoggerFactory.getLogger(PersonController.class);
+    private static final Logger logger = LoggerFactory.getLogger(PersonController.class);
 
     @GetMapping("/person")
     public MappingJacksonValue personsList() {
-        List personList = personRepository.findAll();
+        List<Person> personList = personRepository.findAll();
         return HelperRepository.getFilter("personFilter", personList, "id", "");
     }
 
-    @GetMapping("/person/{id}")
-    public Person getPerson(@PathVariable("id") int id) {
+    @GetMapping("/person/{firstName}/{lastName}")
+    public MappingJacksonValue getPerson(@PathVariable("firstName") String firstName, @PathVariable("lastName") String lastName) {
 
-         Person person = personRepository.findById(id);
+         Person person = personRepository.findByFirstNameAndLastName(firstName, lastName);
 
          if(person == null) {
-             logger.error("La personne avec l'id: " + id + " est introuvable!");
-             throw new NotFoundException("La personne avec l'id: " + id + " est introuvable!");
+             logger.error("La personne avec le prénom et le nom: " + firstName + " " +lastName + " est introuvable!");
+             throw new NotFoundException("La personne avec le prénom et le nom: " + firstName + " " +lastName + " est introuvable!");
          }
 
-        logger.info("Informations sur la personne avec l'id: "+ id);
-         return person;
+        logger.info("Informations sur la personne avec lne nom est le prénom: "+ firstName + " " + lastName);
+         return HelperRepository.getNoFilter("personFilter", person);
     }
 
     @PostMapping("/person")
@@ -61,27 +61,27 @@ public class PersonController {
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping("/person/{id}")
-    public Person updatePerson (@PathVariable("id") int id, @RequestBody Person person) {
-        Person personToUpdate = personRepository.findById(id);
+    @PutMapping("/person/{firstName}/{lastName}")
+    public MappingJacksonValue updatePerson (@PathVariable("firstName") String firstName, @PathVariable("lastName") String lastName, @RequestBody Person person) {
+        Person personToUpdate = personRepository.findByFirstNameAndLastName(firstName, lastName);
 
         if(personToUpdate == null) {
-            logger.error("La personne avec l'id: " + id + " est introuvable!");
-            throw new NotFoundException("La personne avec l'id: " + id + " est introuvable!");
+            logger.error("La personne avec le prénom et le nom: " + firstName + " " +lastName + " est introuvable!");
+            throw new NotFoundException("La personne avec le prénom et le nom: " + firstName + " " +lastName + " est introuvable!");
         }
-        return personRepository.update(id, person);
+        return HelperRepository.getNoFilter("personFilter", personRepository.update(firstName, lastName, person));
     }
 
-    @DeleteMapping("/person/{id}")
-    public void deletePerson (@PathVariable("id") int id) {
-        Person person = personRepository.findById(id);
+    @DeleteMapping("/person/{firstName}/{lastName}")
+    public void deletePerson (@PathVariable("firstName") String firstName, @PathVariable("lastName") String lastName) {
+        Person person = personRepository.findByFirstNameAndLastName(firstName, lastName);
 
         if(person == null) {
-            logger.error("La personne avec l'id: " + id + " est introuvable!");
-            throw new NotFoundException("La personne avec l'id: " + id + " est introuvable!");
+            logger.error("La personne avec le prénom et le nom: " + firstName + " " +lastName + " est introuvable!");
+            throw new NotFoundException("La personne avec le prénom et le nom: " + firstName + " " +lastName + " est introuvable!");
         }
 
-        personRepository.delete(id);
+        personRepository.delete(firstName, lastName);
     }
 
 }

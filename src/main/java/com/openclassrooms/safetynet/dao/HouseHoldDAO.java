@@ -9,5 +9,7 @@ public interface HouseHoldDAO {
 
     List<Person> findByAddress(String address);
 
-    List<Person> findChildrenByAddress(String address);
+    List<Map<String, String>> findChildrenByAddress(String address);
+
+    List<Map<String, String>> findAdultsByAddress (String address);
 }
