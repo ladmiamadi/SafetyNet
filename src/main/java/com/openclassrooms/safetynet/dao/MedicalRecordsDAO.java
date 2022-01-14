@@ -7,11 +7,11 @@ import java.util.List;
 public interface MedicalRecordsDAO {
     List<MedicalRecords> findAll ();
 
-    MedicalRecords findById(int id);
+    MedicalRecords findByFirstNameAndLastName(String firstName, String lastName);
 
     MedicalRecords save(MedicalRecords medicalRecords);
 
-    MedicalRecords update(int id, MedicalRecords medicalRecords);
+    MedicalRecords update(String firstName, String lastName, MedicalRecords medicalRecords);
 
-    void delete(int id);
+    void delete(String firstName, String lastName);
 }

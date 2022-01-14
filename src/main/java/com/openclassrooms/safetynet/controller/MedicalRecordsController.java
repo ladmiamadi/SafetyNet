@@ -22,26 +22,27 @@ public class MedicalRecordsController {
     private final static Logger logger = LoggerFactory.getLogger(PersonController.class);
 
     @GetMapping("/medicalRecord")
-    public Iterable<MedicalRecords> MedicalRecordsList() {
+    public Iterable<MedicalRecords> getMedicalRecordsList() {
         return medicalRecordsRepository.findAll();
     }
 
-    @GetMapping("/medicalRecord/{id}")
-    public MedicalRecords getPerson(@PathVariable("id") int id) {
+    @GetMapping("/medicalRecord/{firstName}/{lastName}")
+    public MedicalRecords getMedicalRecordsForPerson(@PathVariable("firstName") String firstName,
+                                                     @PathVariable("lastName") String lastName) {
 
-        MedicalRecords medicalRecords = medicalRecordsRepository.findById(id);
+        MedicalRecords medicalRecords = medicalRecordsRepository.findByFirstNameAndLastName(firstName, lastName);
 
         if(medicalRecords == null) {
-            logger.error("Les renseignements sur la personne avec l'id: " + id + " sont introuvables!");
-            throw new NotFoundException("Les renseignements sur la personne avec l'id: " + id + " sont introuvables!");
+            logger.error("Les renseignements sur la personne avec le prénom et le nom: \" + firstName + \" \"+lastName + \" sont introuvables!");
+            throw new NotFoundException("Les renseignements sur la personne avec le prénom et le nom: \" + firstName + \" \"+lastName + \" sont introuvables!");
         }
 
-        logger.info("Renseignements sur la personne avec l'id: "+ id);
+        logger.info("Renseignements sur la personne avec le prénom et le nom: "+ firstName+ " " + lastName);
         return medicalRecords;
     }
 
     @PostMapping("/medicalRecord")
-    public ResponseEntity<Person> createPerson (@RequestBody MedicalRecords medicalRecords) {
+    public ResponseEntity<Person> createMedicalRecordsForPerson (@RequestBody MedicalRecords medicalRecords) {
         MedicalRecords addedMedicalRecords = medicalRecordsRepository.save(medicalRecords);
 
         if(Objects.isNull(addedMedicalRecords)) {
@@ -59,26 +60,29 @@ public class MedicalRecordsController {
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping("/medicalRecord/{id}")
-    public MedicalRecords updatePerson (@PathVariable("id") int id, @RequestBody MedicalRecords medicalRecords) {
-        MedicalRecords medicalRecordsToUpdate = medicalRecordsRepository.findById(id);
+    @PutMapping("/medicalRecord/{firstName}/{lastName}")
+    public MedicalRecords updateMedicalRecordsForPerson (@PathVariable("firstName") String firstName,
+                                        @PathVariable("lastName") String lastName,
+                                        @RequestBody MedicalRecords medicalRecords) {
+        MedicalRecords medicalRecordsToUpdate = medicalRecordsRepository.findByFirstNameAndLastName(firstName, lastName);
 
         if(medicalRecordsToUpdate == null) {
-            logger.error("Les renseignements sur la personne avec l'id: " + id + " sont introuvables!");
-            throw new NotFoundException("Les renseignements sur la personne avec l'id: " + id + " sont introuvables!");
+            logger.error("Les renseignements sur la personne avec le prénom et le nom: " + firstName + " "+lastName + " sont introuvables!");
+            throw new NotFoundException("Les renseignements sur la personne avec le prénom et le nom: " + firstName + " "+lastName + " sont introuvables!");
         }
-        return medicalRecordsRepository.update(id, medicalRecords);
+        return medicalRecordsRepository.update(firstName, lastName, medicalRecords);
     }
 
-    @DeleteMapping("/medicalRecord/{id}")
-    public void deletePerson (@PathVariable("id") int id) {
-        MedicalRecords medicalRecords = medicalRecordsRepository.findById(id);
+    @DeleteMapping("/medicalRecord/{firstName}/{lastName}")
+    public void deleteMedicalRecordsForPerson (@PathVariable("firstName") String firstName,
+                              @PathVariable("lastName") String lastName) {
+        MedicalRecords medicalRecords = medicalRecordsRepository.findByFirstNameAndLastName(firstName, lastName);
 
         if(medicalRecords == null) {
-            logger.error("Les renseignements sur la personne avec l'id: " + id + " sont introuvables!");
-            throw new NotFoundException("Les renseignements sur la personne avec l'id: " + id + " sont introuvables!");
+            logger.error("Les renseignements sur la personne avec le prénom et le nom: " + firstName + " "+lastName + " sont introuvables!");
+            throw new NotFoundException("Les renseignements sur la personne avec le prénom et le nom: " + firstName + " "+lastName + " sont introuvables!");
         }
 
-        medicalRecordsRepository.delete(id);
+        medicalRecordsRepository.delete(firstName, lastName);
     }
 }
