@@ -19,7 +19,7 @@ public class MedicalRecordsController {
     @Autowired
     MedicalRecordsRepository medicalRecordsRepository;
 
-    private static Logger logger = LoggerFactory.getLogger(PersonController.class);
+    private final static Logger logger = LoggerFactory.getLogger(PersonController.class);
 
     @GetMapping("/medicalRecord")
     public Iterable<MedicalRecords> MedicalRecordsList() {

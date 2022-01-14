@@ -37,12 +37,16 @@ public class DataFromJson {
 
     public List<Person> getPersons() {
         List<Person> persons = new ArrayList<>();
-        List<MedicalRecords> medicalRecords = getMedicalRecords();
+
         Any readPersons = buffer.get("persons");
 
-        readPersons.forEach(a -> persons.add(new Person(persons.size(), a.get("firstName").toString(), a.get("lastName").toString(),
+        readPersons.forEach(a -> {
+            MedicalRecords medicalRecords = getMedicalRecordByFirstNameAndLastName(a.get("firstName").toString(), a.get("lastName").toString());
+            persons.add(new Person(a.get("firstName").toString(), a.get("lastName").toString(),
                                 a.get("phone").toString(), a.get("email").toString(), a.get("address").toString(),
-                                a.get("city").toString(), a.get("zip").toString(), medicalRecords.get(persons.size()))));
+                                a.get("city").toString(), a.get("zip").toString(), medicalRecords));
+        }
+        );
         return persons;
     }
 
@@ -71,6 +75,15 @@ public class DataFromJson {
                 a.get("birthdate").toString(), getList(a.get("medications")), getList(a.get("allergies")))));
 
         return medicalRecordsList;
+    }
+
+    public MedicalRecords getMedicalRecordByFirstNameAndLastName (String firstName, String lastName) {
+        for(MedicalRecords medicalRecord: getMedicalRecords()) {
+            if(Objects.equals(medicalRecord.getFirstName(), firstName) && Objects.equals(medicalRecord.getLastName(), lastName)) {
+                return medicalRecord;
+            }
+        }
+        return null;
     }
 
     public Map<String, List<Person>> getHouseHold () {

@@ -52,8 +52,8 @@ public class PersonController {
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("{/id}")
-                .buildAndExpand(addedPerson.getId())
+                .path("{/firstName/lastName}")
+                .buildAndExpand(addedPerson.getFirstName(), addedPerson.getLastName())
                 .toUri();
 
         logger.info("La personne a été crée avec succés!");
