@@ -19,7 +19,7 @@ public class FireStationController {
     @Autowired
     FireStationRepository fireStationRepository;
 
-    private final static Logger logger = LoggerFactory.getLogger(PersonController.class);
+    private final static Logger logger = LoggerFactory.getLogger(FireStationController.class);
 
     @GetMapping("/firestation")
     public Map<Integer, FireStation> fireStationsList() {
@@ -81,6 +81,4 @@ public class FireStationController {
 
         fireStationRepository.delete(id);
     }
-
-
 }
