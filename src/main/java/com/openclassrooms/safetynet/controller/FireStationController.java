@@ -60,7 +60,7 @@ public class FireStationController {
     }
 
     @PutMapping("/firestation/{id}")
-    public FireStation updatePerson (@PathVariable("id") int id, @RequestBody FireStation fireStation) {
+    public FireStation updateFireStation (@PathVariable("id") int id, @RequestBody FireStation fireStation) {
         FireStation fireStationToUpdate = fireStationRepository.findById(id);
 
         if(fireStationToUpdate == null) {

@@ -1,7 +1,11 @@
 package com.openclassrooms.safetynet.model;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import lombok.Data;
+import org.springframework.context.annotation.Configuration;
 
 @Data
 @JsonFilter("personFilter")
@@ -28,3 +32,4 @@ public class Person {
         this.medicalRecords = medicalRecords;
     }
 }
+
