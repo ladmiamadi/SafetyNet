@@ -74,7 +74,7 @@ public class MedicalRecordsController {
     }
 
     @DeleteMapping("/medicalRecord/{firstName}/{lastName}")
-    public void deleteMedicalRecordsForPerson (@PathVariable("firstName") String firstName,
+    public ResponseEntity<MedicalRecords> deleteMedicalRecordsForPerson (@PathVariable("firstName") String firstName,
                               @PathVariable("lastName") String lastName) {
         MedicalRecords medicalRecords = medicalRecordsRepository.findByFirstNameAndLastName(firstName, lastName);
 
@@ -84,5 +84,6 @@ public class MedicalRecordsController {
         }
 
         medicalRecordsRepository.delete(firstName, lastName);
+        return ResponseEntity.noContent().build();
     }
 }

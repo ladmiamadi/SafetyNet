@@ -1,7 +1,6 @@
 package com.openclassrooms.safetynet.repository;
 
 import com.openclassrooms.safetynet.dao.DataFromJson;
-import com.openclassrooms.safetynet.dao.HouseHoldDAO;
 import com.openclassrooms.safetynet.model.Person;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +8,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Repository
-public class HouseHoldRepository implements HouseHoldDAO {
+public class HouseHoldRepository {
 
 private static DataFromJson dataFromJson;
 
@@ -17,13 +16,13 @@ private static DataFromJson dataFromJson;
         dataFromJson = new DataFromJson();
     }
 
-    @Override
+
     public Map<String, List<Person>> findAll() {
 
         return dataFromJson.getHouseHold();
     }
 
-    @Override
+
     public List<Person> findByAddress(String address) {
         Map<String, List<Person>> houseHold = findAll();
         List<Person> members = new ArrayList<>();
@@ -36,7 +35,6 @@ private static DataFromJson dataFromJson;
         return  members;
     }
 
-    @Override
     public List<Map<String, String>> findChildrenByAddress(String address) {
         List<Map<String, String>> childrenList = new ArrayList<>();
         for(Person person: findByAddress(address)) {
@@ -54,7 +52,6 @@ private static DataFromJson dataFromJson;
         return childrenList;
     }
 
-    @Override
     public List<Map<String, String>> findAdultsByAddress(String address) {
         List<Map<String, String>> adultList = new ArrayList<>();
         for(Person person: findByAddress(address)) {

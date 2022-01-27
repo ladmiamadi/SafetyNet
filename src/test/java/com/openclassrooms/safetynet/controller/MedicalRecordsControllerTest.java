@@ -131,7 +131,7 @@ public class MedicalRecordsControllerTest {
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/medicalRecord/Ladmia/Madi")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test

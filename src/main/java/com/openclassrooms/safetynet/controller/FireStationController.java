@@ -41,7 +41,7 @@ public class FireStationController {
     }
 
     @PostMapping("/firestation")
-    public ResponseEntity<Person> createPerson (@RequestBody FireStation fireStation) {
+    public ResponseEntity<Person> createFireStation (@RequestBody FireStation fireStation) {
         FireStation addedFireStation = fireStationRepository.save(fireStation);
 
         if(Objects.isNull(addedFireStation)) {
@@ -71,7 +71,7 @@ public class FireStationController {
     }
 
     @DeleteMapping("/firestation/{id}")
-    public void deletePerson (@PathVariable("id") int id) {
+    public ResponseEntity<FireStation> deleteFireStation (@PathVariable("id") int id) {
         FireStation fireStation = fireStationRepository.findById(id);
 
         if(fireStation == null) {
@@ -80,5 +80,7 @@ public class FireStationController {
         }
 
         fireStationRepository.delete(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,9 +1,7 @@
 package com.openclassrooms.safetynet.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.openclassrooms.safetynet.controller.FireStationController;
 import com.openclassrooms.safetynet.model.FireStation;
-import com.openclassrooms.safetynet.model.Person;
 import com.openclassrooms.safetynet.repository.FireStationRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,8 +30,8 @@ public class fireStationControllerTest {
     @MockBean
     private FireStationRepository fireStationRepository;
 
-    FireStation fireStation1 = new FireStation("1", Arrays.asList("03 Rue Des 24 Arpents", "Rue Rivoli"));
-    FireStation fireStation2 = new FireStation("2", Arrays.asList("Place de Clichy", "Bv Victor Bordier"));
+    FireStation fireStation1 = new FireStation("5", Arrays.asList("03 Rue Des 24 Arpents", "Rue Rivoli"));
+    FireStation fireStation2 = new FireStation("6", Arrays.asList("Place de Clichy", "Bv Victor Bordier"));
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -52,11 +50,11 @@ public class fireStationControllerTest {
         Mockito.when(fireStationRepository.findById(Integer.parseInt(fireStation1.getStation()))).thenReturn(fireStation1);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/firestation/1")
+                        .get("/firestation/5")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
-                .andExpect(jsonPath("$.station", is("1")));
+                .andExpect(jsonPath("$.station", is("5")));
     }
 
     @Test
@@ -101,11 +99,11 @@ public class fireStationControllerTest {
     public void testUpdateFireStationSuccess() throws Exception {
         Map fireStations = Map.of(Integer.parseInt(fireStation1.getStation()), fireStation1, Integer.parseInt(fireStation2.getStation()), fireStation2);
 
-        FireStation updatedFireStation = new FireStation("1", Arrays.asList("03 Rue Des 24 Arpents", "Rue Rivoli"));
+        FireStation updatedFireStation = new FireStation("5", Arrays.asList("03 Rue Des 24 Arpents", "Rue Rivoli"));
 
         Mockito.when(fireStationRepository.findById(Integer.parseInt(fireStation1.getStation()))).thenReturn((FireStation) fireStations.get(Integer.parseInt(fireStation1.getStation())));
 
-        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.put("/firestation/1")
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.put("/firestation/5")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(this.mapper.writeValueAsString(updatedFireStation));
@@ -137,9 +135,9 @@ public class fireStationControllerTest {
         Mockito.when(fireStationRepository.findById(Integer.parseInt(fireStation1.getStation()))).thenReturn((FireStation) fireStations.get(Integer.parseInt(fireStation1.getStation())));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/firestation/1")
+                        .delete("/firestation/5")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test

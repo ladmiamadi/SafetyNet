@@ -5,6 +5,7 @@ import com.jsoniter.any.Any;
 import com.openclassrooms.safetynet.model.FireStation;
 import com.openclassrooms.safetynet.model.MedicalRecords;
 import com.openclassrooms.safetynet.model.Person;
+import com.openclassrooms.safetynet.repository.MedicalRecordsRepository;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -35,13 +36,14 @@ public class DataFromJson {
         return medicationsList;
     }
 
-    public List<Person> getPersons() {
+    public List<Person> getPersons() throws IOException {
         List<Person> persons = new ArrayList<>();
+        MedicalRecordsRepository medicalRecordsRepository = new MedicalRecordsRepository();
 
         Any readPersons = buffer.get("persons");
 
         readPersons.forEach(a -> {
-            MedicalRecords medicalRecords = getMedicalRecordByFirstNameAndLastName(a.get("firstName").toString(), a.get("lastName").toString());
+            MedicalRecords medicalRecords = medicalRecordsRepository.findByFirstNameAndLastName(a.get("firstName").toString(), a.get("lastName").toString());
             persons.add(new Person(a.get("firstName").toString(), a.get("lastName").toString(),
                                 a.get("phone").toString(), a.get("email").toString(), a.get("address").toString(),
                                 a.get("city").toString(), a.get("zip").toString(), medicalRecords));
@@ -77,18 +79,14 @@ public class DataFromJson {
         return medicalRecordsList;
     }
 
-    public MedicalRecords getMedicalRecordByFirstNameAndLastName (String firstName, String lastName) {
-        for(MedicalRecords medicalRecord: getMedicalRecords()) {
-            if(Objects.equals(medicalRecord.getFirstName(), firstName) && Objects.equals(medicalRecord.getLastName(), lastName)) {
-                return medicalRecord;
-            }
-        }
-        return null;
-    }
-
-    public Map<String, List<Person>> getHouseHold () {
+    public Map<String, List<Person>> getHouseHold (){
         Map<String, List<Person>> houseHoldList = new HashMap<>();
-        List<Person> personList = getPersons();
+        List<Person> personList = null;
+        try {
+            personList = getPersons();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         for (Person person : personList) {
             if (houseHoldList.containsKey(person.getAddress())) {

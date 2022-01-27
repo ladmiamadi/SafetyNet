@@ -1,25 +1,26 @@
 package com.openclassrooms.safetynet.controller;
 
-import com.openclassrooms.safetynet.exceptions.InvalidParameterException;
-import com.openclassrooms.safetynet.exceptions.NotFoundException;
 import com.openclassrooms.safetynet.model.FireStation;
 import com.openclassrooms.safetynet.model.Person;
 import com.openclassrooms.safetynet.repository.FireStationRepository;
 import com.openclassrooms.safetynet.repository.HelperRepository;
 import com.openclassrooms.safetynet.repository.HouseHoldRepository;
 import com.openclassrooms.safetynet.repository.PersonRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
 import java.util.*;
+
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 @RestController
 public class AlertController {
-    private static final Logger logger = LoggerFactory.getLogger(AlertController.class);
+    private static final Logger logger = getLogger(AlertController.class);
 
     @Autowired
     PersonRepository personRepository;
@@ -32,14 +33,14 @@ public class AlertController {
 
     //Récuperer la Liste des habitant couverts par une station
     @GetMapping("/firestations")
-    public MappingJacksonValue getCoveredPersonsByFirestation (@RequestParam("stationNumber") Integer stationNumber) {
+    public MappingJacksonValue getCoveredPersonsByFireStation (@RequestParam(value = "stationNumber") Integer stationNumber) {
         List personsList = new ArrayList<>();
 
-        if(stationNumber != null) {
+
             FireStation fireStation = fireStationRepository.findById(stationNumber);
             if(fireStation == null) {
-                logger.error("La caserne de pompiers ayant le numéro " + stationNumber + "est introuvable!");
-                throw new NotFoundException("La caserne de pompiers ayant le numéro " + stationNumber + "est introuvable!");
+                logger.error("La caserne de pompiers ayant le numéro " + stationNumber + " est introuvable!");
+                return HelperRepository.getFilter("personFilter", personsList, "");
             }
 
             List<String> addresses = new ArrayList<>(fireStation.getAddresses());
@@ -48,10 +49,7 @@ public class AlertController {
 
             personsList.add(HelperRepository.countChildrenAndAdults(personsList));
             logger.info("Calcul l'age de l'habitant avec succées");
-        } else {
-            logger.error("Le paramétre stationNumber ne peut pas étre vide");
-            throw new InvalidParameterException("Le paramétre stationNumber ne peut pas étre vide");
-        }
+
             return HelperRepository.getFilter("personFilter", personsList, "medicalRecords", "email", "city", "zip");
         }
 
@@ -60,16 +58,19 @@ public class AlertController {
     public Map<String, List<Map<String, String>>> getChildrenByAddress(@RequestParam("address") String address) {
         Map<String, List<Map<String, String>>> personList = new LinkedHashMap<>();
 
-        if(address != null) {
             List<Map<String, String>> childrenList = houseHoldRepository.findChildrenByAddress(address);
             if( !childrenList.isEmpty()) {
                 List<Map<String, String>> adultList = houseHoldRepository.findAdultsByAddress(address);
                 personList.put("List of children", childrenList);
+                logger.debug("Liste d'enfants: " + childrenList);
                 personList.put("other members of the household", adultList);
+                logger.debug("Liste d'adulte: " + adultList);
+                logger.info("Obtention de la liste des enfants avec succées");
             } else {
-                logger.debug("Pas d'enfants dans ce foyer");
+                logger.info("Pas d'enfants dans le foyer ayant l'adresse " + address + " ou bien l'adresse est incorrecte!!");
+                return personList;
             }
-        }
+
         return personList;
     }
 
@@ -77,22 +78,23 @@ public class AlertController {
     @GetMapping("/phoneALert")
     public List<String> phonesList(@RequestParam("firestation") Integer firestation) {
         List<String> phoneList = new ArrayList<>();
-        if(firestation != null) {
+
             FireStation fireStation = fireStationRepository.findById(firestation);
 
             if(fireStation == null) {
                 logger.error("la station de pompiers avec le numéro "+fireStation +" n'existe pas!!");
-                throw new NotFoundException("la station de pompiers avec le numéro "+fireStation +" n'existe pas!!");
+                return phoneList;
             }
 
             List<String> addresses = new ArrayList<>(fireStation.getAddresses());
             addresses.forEach(address -> personRepository.findByAddress(address).forEach(person ->{
                 if(!phoneList.contains(person.getPhone())) {
                     phoneList.add(person.getPhone());
+                    logger.debug("Numéro de téléphone: " + person.getPhone());
                 }
                     }));
             logger.info("Obtention des numéros de téléphones avec succées!");
-        }
+
         return phoneList;
     }
 
@@ -102,45 +104,46 @@ public class AlertController {
         Map fireStationPersonsList = new LinkedHashMap<>();
         List<Map> personsList = new ArrayList<>();
 
-        if(address != null) {
-            if(personRepository.findByAddress(address) == null) {
-                logger.error("L'adresse "+address+ "est introuvable!!");
-                throw new NotFoundException("L'adresse "+address+ "est introuvable!!");
+            if(personRepository.findByAddress(address).isEmpty()) {
+                logger.error("L'adresse "+address+ " est introuvable!!");
+                return new HashMap();
             }
 
             for(Person person: personRepository.findByAddress(address)) {
                 Map member = new LinkedHashMap<>();
                 member.put("firstName", person.getFirstName());
                 member.put("lastName", person.getLastName());
-                logger.debug("Calculer l'age");
                 member.put("age", HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate()) + " years");
                 member.put("medications", person.getMedicalRecords().getMedications());
                 member.put("allergies", person.getMedicalRecords().getAllergies());
 
+                logger.debug("Membbre: " + member);
                 personsList.add(member);
             }
 
             fireStationPersonsList.put("persons", personsList);
             fireStationPersonsList.put("covered By station ", fireStationRepository.findByAddress(address));
-        }
 
         return fireStationPersonsList;
     }
 
     //Récuperer les habitants d'une addresse desservie par une station de pompiers
-    @GetMapping("/flood")
-    public Map<String, List> getHouseHoldForFloodALert (@RequestParam("stations") List<String> stations) {
+    @GetMapping("/flood/stations")
+    public Map<String, List> getHouseHoldForFloodALert (@RequestParam("stations") List<String> stations) throws IOException {
         List<String> addresses = new ArrayList<>();
         Map<String, List> houseHold = new HashMap<>();
         List<Map> persons = new ArrayList<>();
 
         if(!stations.isEmpty()) {
             for (String station : stations) {
-                addresses.addAll(fireStationRepository.findById(Integer.parseInt(station)).getAddresses());
-
-                if(addresses.isEmpty()) {
-                    logger.error("La station "+ station+ " n'existe pas!!");
+                if(fireStationRepository.findById(Integer.valueOf(station)) != null) {
+                    addresses.addAll(fireStationRepository.findById(Integer.parseInt(station)).getAddresses());
+                } else {
+                    logger.error("La station "+ station + " n'existe pas!!");
                 }
+            }
+            if (addresses.isEmpty()) {
+                return houseHold;
             }
         }
 
@@ -156,6 +159,7 @@ public class AlertController {
 
                 persons.add(person);
             });
+
             houseHold.put(address, persons);
         }
         return houseHold;
@@ -171,7 +175,7 @@ public class AlertController {
 
         if(person == null) {
             logger.error("La personne " + firstName+" " + lastName+" n'existe pas!!");
-            throw  new NotFoundException("La personne " + firstName+" " + lastName+" n'existe pas!!");
+            return new ArrayList<>();
         }
 
             Map info = new LinkedHashMap<>();
@@ -179,12 +183,13 @@ public class AlertController {
             info.put("firstName", person.getFirstName());
             info.put("lastName", person.getLastName());
             info.put("address", person.getAddress());
-            info.put("age", HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate() + " years"));
+            info.put("age", HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate()) + " years");
             info.put("medications", person.getMedicalRecords().getMedications());
             info.put("allergies", person.getMedicalRecords().getAllergies());
 
             personInfoList.add(info);
 
+            logger.debug("Personne: "+person );
             logger.info("Récuperation des informations sur la personne avec succées!!");
 
         return personInfoList;
@@ -194,10 +199,10 @@ public class AlertController {
     @GetMapping("/communityEmail")
     public List<String> emailsList(@RequestParam("city") String city) {
         List<String> emailsList = new ArrayList<>();
-        if(city != null) {
-            if(personRepository.findEmailsByCity(city) == null) {
+
+            if(personRepository.findEmailsByCity(city).isEmpty()) {
                 logger.error("la cité "+ city+ " est introuvable!!");
-                throw new NotFoundException("la cité "+ city+ " est introuvable!!");
+                return emailsList;
             }
 
             for(String email: personRepository.findEmailsByCity(city)) {
@@ -205,7 +210,8 @@ public class AlertController {
                     emailsList.add(email);
                 }
             }
-        }
+            logger.debug("Liste des email: " + emailsList);
+
         return emailsList;
     }
 }

@@ -1,8 +1,0 @@
-2022-01-01 17:52:44.209  INFO 34812 --- [main] c.o.safetynet.SafetynetApplication       : Starting SafetynetApplication using Java 17.0.1 on LAPTOP-D3FVQT38 with PID 34812 (C:\Users\ladmi\OneDrive\Bureau\Formation OpenClassroom\Projet 5\safetynet\safetynet\target\classes started by ladmi in C:\Users\ladmi\OneDrive\Bureau\Formation OpenClassroom\Projet 5\safetynet\safetynet)
-2022-01-01 17:52:44.212  INFO 34812 --- [main] c.o.safetynet.SafetynetApplication       : No active profile set, falling back to default profiles: default
-2022-01-01 17:52:45.123 DEBUG 34812 --- [main] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
-2022-01-01 17:52:45.173 DEBUG 34812 --- [main] s.w.s.m.m.a.RequestMappingHandlerMapping : 2 mappings in 'requestMappingHandlerMapping'
-2022-01-01 17:52:45.196 DEBUG 34812 --- [main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
-2022-01-01 17:52:45.201 DEBUG 34812 --- [main] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
-2022-01-01 17:52:45.334  INFO 34812 --- [main] c.o.safetynet.SafetynetApplication       : Started SafetynetApplication in 1.391 seconds (JVM running for 1.908)
-2022-01-01 17:52:45.339  INFO 34812 --- [main] c.o.safetynet.SafetynetApplication       : Get Greeting Message Input: 

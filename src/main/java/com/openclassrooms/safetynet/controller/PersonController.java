@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 public class PersonController {
@@ -38,18 +37,16 @@ public class PersonController {
              throw new NotFoundException("La personne avec le prénom et le nom: " + firstName + " " +lastName + " est introuvable!");
          }
 
-        logger.info("Informations sur la personne avec lne nom est le prénom: "+ firstName + " " + lastName);
+        logger.info("Informations sur la personne avec le nom et le prénom: "+ firstName + " " + lastName);
          return HelperRepository.getNoFilter("personFilter", person);
     }
 
     @PostMapping("/person")
     public ResponseEntity<Person> createPerson (@RequestBody Person person) {
+
+
         Person addedPerson = personRepository.save(person);
-
-        if(Objects.isNull(addedPerson)) {
-            return ResponseEntity.noContent().build();
-        }
-
+        logger.debug("Création de la personne " + addedPerson);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("{/firstName/lastName}")
@@ -73,7 +70,7 @@ public class PersonController {
     }
 
     @DeleteMapping("/person/{firstName}/{lastName}")
-    public void deletePerson (@PathVariable("firstName") String firstName, @PathVariable("lastName") String lastName) {
+    public ResponseEntity<Person> deletePerson (@PathVariable("firstName") String firstName, @PathVariable("lastName") String lastName) {
         Person person = personRepository.findByFirstNameAndLastName(firstName, lastName);
 
         if(person == null) {
@@ -82,6 +79,8 @@ public class PersonController {
         }
 
         personRepository.delete(firstName, lastName);
+
+        return ResponseEntity.noContent().build();
     }
 
 }

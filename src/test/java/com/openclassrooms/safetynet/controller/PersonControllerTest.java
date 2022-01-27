@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @WebMvcTest(controllers = PersonController.class)
 public class PersonControllerTest {
@@ -101,10 +102,12 @@ public class PersonControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    /*@Test
+    @Test
     public void testUpdatePersonSuccess() throws Exception {
         Person updatedPerson = new Person("Ladmia", "Madi", "06060505", "ladmia.madi@gmail.com", "Rue des 24 Arpents", "Culver", "95370", null);
+
         Mockito.when(personRepository.findByFirstNameAndLastName("Ladmia", "Madi")).thenReturn(person1);
+        Mockito.when(personRepository.update("Ladmia", "Madi", updatedPerson)).thenReturn(updatedPerson);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.put("/person/Ladmia/Madi")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -114,7 +117,7 @@ public class PersonControllerTest {
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk());
-    }*/
+    }
 
     @Test
     public void testUpdatePersonFail() throws Exception {
@@ -137,7 +140,7 @@ public class PersonControllerTest {
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/person/Ladmia/Madi")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
