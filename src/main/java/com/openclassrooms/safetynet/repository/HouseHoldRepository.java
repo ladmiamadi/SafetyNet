@@ -2,8 +2,8 @@ package com.openclassrooms.safetynet.repository;
 
 import com.openclassrooms.safetynet.dao.DataFromJson;
 import com.openclassrooms.safetynet.model.Person;
+import com.openclassrooms.safetynet.service.Helper;
 import org.springframework.stereotype.Repository;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -16,12 +16,10 @@ private static DataFromJson dataFromJson;
         dataFromJson = new DataFromJson();
     }
 
-
     public Map<String, List<Person>> findAll() {
 
         return dataFromJson.getHouseHold();
     }
-
 
     public List<Person> findByAddress(String address) {
         Map<String, List<Person>> houseHold = findAll();
@@ -38,7 +36,7 @@ private static DataFromJson dataFromJson;
     public List<Map<String, String>> findChildrenByAddress(String address) {
         List<Map<String, String>> childrenList = new ArrayList<>();
         for(Person person: findByAddress(address)) {
-            long age = HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate());
+            long age = Helper.calculateAge(person.getMedicalRecords().getBirthDate());
 
 
             if(age <= 18) {
@@ -55,9 +53,9 @@ private static DataFromJson dataFromJson;
     public List<Map<String, String>> findAdultsByAddress(String address) {
         List<Map<String, String>> adultList = new ArrayList<>();
         for(Person person: findByAddress(address)) {
-            long age = HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate());
+            long age = Helper.calculateAge(person.getMedicalRecords().getBirthDate());
 
-            if(HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate()) > 18) {
+            if(Helper.calculateAge(person.getMedicalRecords().getBirthDate()) > 18) {
                 Map<String, String> adult = new LinkedHashMap<>();
                 adult.put("firstName", person.getFirstName());
                 adult.put("lastName", person.getLastName());

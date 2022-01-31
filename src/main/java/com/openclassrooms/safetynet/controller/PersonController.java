@@ -2,7 +2,7 @@ package com.openclassrooms.safetynet.controller;
 
 import com.openclassrooms.safetynet.exceptions.NotFoundException;
 import com.openclassrooms.safetynet.model.Person;
-import com.openclassrooms.safetynet.repository.HelperRepository;
+import com.openclassrooms.safetynet.service.Helper;
 import com.openclassrooms.safetynet.repository.PersonRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ public class PersonController {
     @GetMapping("/person")
     public MappingJacksonValue personsList() {
         List<Person> personList = personRepository.findAll();
-        return HelperRepository.getFilter("personFilter", personList, "id", "");
+        return Helper.getFilter("personFilter", personList, "id", "");
     }
 
     @GetMapping("/person/{firstName}/{lastName}")
@@ -38,7 +38,7 @@ public class PersonController {
          }
 
         logger.info("Informations sur la personne avec le nom et le prénom: "+ firstName + " " + lastName);
-         return HelperRepository.getNoFilter("personFilter", person);
+         return Helper.getNoFilter("personFilter", person);
     }
 
     @PostMapping("/person")
@@ -66,7 +66,7 @@ public class PersonController {
             logger.error("La personne avec le prénom et le nom: " + firstName + " " +lastName + " est introuvable!");
             throw new NotFoundException("La personne avec le prénom et le nom: " + firstName + " " +lastName + " est introuvable!");
         }
-        return HelperRepository.getNoFilter("personFilter", personRepository.update(firstName, lastName, person));
+        return Helper.getNoFilter("personFilter", personRepository.update(firstName, lastName, person));
     }
 
     @DeleteMapping("/person/{firstName}/{lastName}")

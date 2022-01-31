@@ -4,6 +4,7 @@ import com.openclassrooms.safetynet.model.FireStation;
 import com.openclassrooms.safetynet.model.MedicalRecords;
 import com.openclassrooms.safetynet.model.Person;
 import com.openclassrooms.safetynet.repository.*;
+import com.openclassrooms.safetynet.service.Helper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +75,7 @@ public class AlertControllerTest {
         Map<String, String> childrenList = new LinkedHashMap<>();
         childrenList.put("firstName", person3.getFirstName());
         childrenList.put("lastName", person3.getLastName());
-        childrenList.put("age", String.valueOf(HelperRepository.calculateAge(medicalRecords3.getBirthDate())));
+        childrenList.put("age", String.valueOf(Helper.calculateAge(medicalRecords3.getBirthDate())));
         Mockito.when(houseHoldRepository.findChildrenByAddress(person3.getAddress())).thenReturn(List.of(childrenList));
 
         mockMvc.perform(get("/childAlert")

@@ -42,7 +42,7 @@ public class MedicalRecordsController {
     }
 
     @PostMapping("/medicalRecord")
-    public ResponseEntity<Person> createMedicalRecordsForPerson (@RequestBody MedicalRecords medicalRecords) {
+    public ResponseEntity<Person> createMedicalRecords (@RequestBody MedicalRecords medicalRecords) {
         MedicalRecords addedMedicalRecords = medicalRecordsRepository.save(medicalRecords);
 
         if(Objects.isNull(addedMedicalRecords)) {
@@ -61,7 +61,7 @@ public class MedicalRecordsController {
     }
 
     @PutMapping("/medicalRecord/{firstName}/{lastName}")
-    public MedicalRecords updateMedicalRecordsForPerson (@PathVariable("firstName") String firstName,
+    public MedicalRecords updateMedicalRecords (@PathVariable("firstName") String firstName,
                                         @PathVariable("lastName") String lastName,
                                         @RequestBody MedicalRecords medicalRecords) {
         MedicalRecords medicalRecordsToUpdate = medicalRecordsRepository.findByFirstNameAndLastName(firstName, lastName);
@@ -74,7 +74,7 @@ public class MedicalRecordsController {
     }
 
     @DeleteMapping("/medicalRecord/{firstName}/{lastName}")
-    public ResponseEntity<MedicalRecords> deleteMedicalRecordsForPerson (@PathVariable("firstName") String firstName,
+    public ResponseEntity<MedicalRecords> deleteMedicalRecords (@PathVariable("firstName") String firstName,
                               @PathVariable("lastName") String lastName) {
         MedicalRecords medicalRecords = medicalRecordsRepository.findByFirstNameAndLastName(firstName, lastName);
 

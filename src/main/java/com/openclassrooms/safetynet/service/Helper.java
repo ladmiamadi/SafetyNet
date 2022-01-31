@@ -1,4 +1,4 @@
-package com.openclassrooms.safetynet.repository;
+package com.openclassrooms.safetynet.service;
 
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import static java.lang.Integer.parseInt;
 
-public class HelperRepository {
+public class Helper {
     public static long calculateAge (String birthDate) {
         String[] str = birthDate.split("/");
         LocalDate start = LocalDate.of(parseInt(str[2]), parseInt(str[0]), parseInt(str[1]));

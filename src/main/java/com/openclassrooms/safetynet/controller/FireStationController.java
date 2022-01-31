@@ -22,7 +22,7 @@ public class FireStationController {
     private final static Logger logger = LoggerFactory.getLogger(FireStationController.class);
 
     @GetMapping("/firestation")
-    public Map<Integer, FireStation> fireStationsList() {
+    public Map<Integer, FireStation> getFireStationsList() {
         return fireStationRepository.findAll();
     }
 

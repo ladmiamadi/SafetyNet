@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @WebMvcTest(controllers = PersonController.class)
 public class PersonControllerTest {

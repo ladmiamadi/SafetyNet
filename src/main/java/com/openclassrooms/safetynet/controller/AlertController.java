@@ -3,7 +3,7 @@ package com.openclassrooms.safetynet.controller;
 import com.openclassrooms.safetynet.model.FireStation;
 import com.openclassrooms.safetynet.model.Person;
 import com.openclassrooms.safetynet.repository.FireStationRepository;
-import com.openclassrooms.safetynet.repository.HelperRepository;
+import com.openclassrooms.safetynet.service.Helper;
 import com.openclassrooms.safetynet.repository.HouseHoldRepository;
 import com.openclassrooms.safetynet.repository.PersonRepository;
 import org.apache.logging.log4j.Logger;
@@ -40,17 +40,17 @@ public class AlertController {
             FireStation fireStation = fireStationRepository.findById(stationNumber);
             if(fireStation == null) {
                 logger.error("La caserne de pompiers ayant le numéro " + stationNumber + " est introuvable!");
-                return HelperRepository.getFilter("personFilter", personsList, "");
+                return Helper.getFilter("personFilter", personsList, "");
             }
 
             List<String> addresses = new ArrayList<>(fireStation.getAddresses());
 
             addresses.forEach(address -> personsList.addAll(personRepository.findByAddress(address)));
 
-            personsList.add(HelperRepository.countChildrenAndAdults(personsList));
+            personsList.add(Helper.countChildrenAndAdults(personsList));
             logger.info("Calcul l'age de l'habitant avec succées");
 
-            return HelperRepository.getFilter("personFilter", personsList, "medicalRecords", "email", "city", "zip");
+            return Helper.getFilter("personFilter", personsList, "medicalRecords", "email", "city", "zip");
         }
 
     //Récuperer la liste d'enfants habitants à une adresse
@@ -76,7 +76,7 @@ public class AlertController {
 
     //Récupérer les numéros de téléphone des personnes desservis par la caserne de pompiers
     @GetMapping("/phoneALert")
-    public List<String> phonesList(@RequestParam("firestation") Integer firestation) {
+    public List<String> getPhonesList(@RequestParam("firestation") Integer firestation) {
         List<String> phoneList = new ArrayList<>();
 
             FireStation fireStation = fireStationRepository.findById(firestation);
@@ -113,7 +113,7 @@ public class AlertController {
                 Map member = new LinkedHashMap<>();
                 member.put("firstName", person.getFirstName());
                 member.put("lastName", person.getLastName());
-                member.put("age", HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate()) + " years");
+                member.put("age", Helper.calculateAge(person.getMedicalRecords().getBirthDate()) + " years");
                 member.put("medications", person.getMedicalRecords().getMedications());
                 member.put("allergies", person.getMedicalRecords().getAllergies());
 
@@ -153,7 +153,7 @@ public class AlertController {
                 person.put("firstName", inhabitant.getFirstName());
                 person.put("lastName", inhabitant.getLastName());
                 person.put("phone", inhabitant.getPhone());
-                person.put("age", String.valueOf(HelperRepository.calculateAge(inhabitant.getMedicalRecords().getBirthDate())));
+                person.put("age", String.valueOf(Helper.calculateAge(inhabitant.getMedicalRecords().getBirthDate())));
                 person.put("medications", inhabitant.getMedicalRecords().getMedications());
                 person.put("allergies", inhabitant.getMedicalRecords().getAllergies());
 
@@ -183,7 +183,7 @@ public class AlertController {
             info.put("firstName", person.getFirstName());
             info.put("lastName", person.getLastName());
             info.put("address", person.getAddress());
-            info.put("age", HelperRepository.calculateAge(person.getMedicalRecords().getBirthDate()) + " years");
+            info.put("age", Helper.calculateAge(person.getMedicalRecords().getBirthDate()) + " years");
             info.put("medications", person.getMedicalRecords().getMedications());
             info.put("allergies", person.getMedicalRecords().getAllergies());
 
@@ -197,7 +197,7 @@ public class AlertController {
 
     //Récupérer les emails de tous habitants d'une ville'
     @GetMapping("/communityEmail")
-    public List<String> emailsList(@RequestParam("city") String city) {
+    public List<String> getEmailsList(@RequestParam("city") String city) {
         List<String> emailsList = new ArrayList<>();
 
             if(personRepository.findEmailsByCity(city).isEmpty()) {

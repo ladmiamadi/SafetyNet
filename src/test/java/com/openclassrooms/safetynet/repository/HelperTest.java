@@ -2,6 +2,7 @@ package com.openclassrooms.safetynet.repository;
 
 import com.openclassrooms.safetynet.model.MedicalRecords;
 import com.openclassrooms.safetynet.model.Person;
+import com.openclassrooms.safetynet.service.Helper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -13,11 +14,11 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-public class HelperRepositoryTest {
+public class HelperTest {
 
     @Test
     public void testCalculateAge() {
-        long result = HelperRepository.calculateAge("07/18/1985");
+        long result = Helper.calculateAge("07/18/1985");
 
         assertThat(result).isEqualTo(36);
     }
@@ -35,7 +36,7 @@ public class HelperRepositoryTest {
 
         List<Person> members = Arrays.asList(person1, person2, person3);
 
-        Map<String, Integer> result = HelperRepository.countChildrenAndAdults(members);
+        Map<String, Integer> result = Helper.countChildrenAndAdults(members);
 
         assertThat(result.containsValue(2)).isTrue();
         assertThat(result.containsValue(1)).isTrue();
